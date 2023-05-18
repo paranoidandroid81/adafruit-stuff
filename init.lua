@@ -1,5 +1,5 @@
-SSID    = "SSID"
-APPWD   = "pwd"
+SSID    = "Mikey's ESP8266"
+APPWD   = "PWD_HERE"
 CMDFILE = "ping.lua"   -- File that is executed after connection
 
 wifiTrys     = 15     -- Counter of trys to connect to wifi
@@ -7,18 +7,17 @@ NUMWIFITRYS  = 200    -- Maximum number of WIFI Testings while waiting for conne
 
 function launch()
   print("Connected to WIFI!")
-  print("IP Address: " .. wifi.sta.getip())
+  print("IP Address: " .. wifi.ap.getip())
   -- Call our command file. Note: if you foul this up you'll brick the device!
-  -- dofile("security.lua")
-  -- makeConn()
+  dofile("cat_treats.lua")
 end
 
 function checkWIFI() 
   if ( wifiTrys > NUMWIFITRYS ) then
     print("Sorry. Not able to connect")
   else
-    ipAddr = wifi.sta.getip()
-    if ( ( ipAddr ~= nil ) and  ( ipAddr ~= "0.0.0.0" ) )then
+    ipAddr = wifi.ap.getip()
+    if ( ( ipAddr ~= nil ) and  ( ipAddr ~= "0.0.0.0" ) ) then
       local my_timer = tmr.create()
       my_timer:alarm(500 , tmr.ALARM_SINGLE , launch )
     else
@@ -33,16 +32,16 @@ end
 
 print("-- Starting up! ")
 
--- Lets see if we are already connected by getting the IP
-ipAddr = wifi.sta.getip()
+-- Lets see if we are already setup by getting the IP
+ipAddr = wifi.ap.getip()
 if ( ( ipAddr == nil ) or  ( ipAddr == "0.0.0.0" ) ) then
   -- We aren't connected, so let's connect
-  print("Configuring WIFI....")
-  wifi.setmode( wifi.STATION )
+  print("Configuring WIFI as access point....")
+  wifi.setmode( wifi.SOFTAP )
   local wifi_config = {}
   wifi_config.ssid = SSID
   wifi_config.pwd = APPWD
-  wifi.sta.config(wifi_config)
+  wifi.ap.config(wifi_config)
   print("Waiting for connection")
   local my_timer = tmr.create()
   my_timer:alarm(2500 , tmr.ALARM_SINGLE , checkWIFI )
